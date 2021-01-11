@@ -1,6 +1,1 @@
 numpy
-scipy
-sklearn
-statsmodels
-seaborn
-pandas
