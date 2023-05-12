@@ -1,7 +1,8 @@
 import unittest
 import random
 
-class test_example(unittest.TestCase):
+
+class TestExample(unittest.TestCase):
     def setUp(self):
         self.seq = list(range(10))
 
@@ -15,7 +16,7 @@ class test_example(unittest.TestCase):
         self.assertEqual(self.seq, list(range(10)))
 
         # should raise an exception for an immutable sequence
-        self.assertRaises(TypeError, random.shuffle, (1,2,3))
+        self.assertRaises(TypeError, random.shuffle, (1, 2, 3))
 
     def test_choice(self):
         element = random.choice(self.seq)

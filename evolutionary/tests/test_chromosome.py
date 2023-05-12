@@ -8,7 +8,6 @@ from evolutionary.chromosome import Chromosome
 
 
 class TestChromosome(unittest.TestCase):
-
     def setUp(self):
         self.context = Context(42)
         self.chrome = Chromosome(self.context, [0.2, 0.4, 0.5, 0.5, 0.9, 0.8, 0.3])
@@ -52,28 +51,96 @@ class TestChromosome(unittest.TestCase):
 
     def testMutate(self):
         self.chrome.mutate()
-        expected = np.array([0.2, 0.4, 0.5, 0.5, 0.15599452033620265, 0.8661761457749352, 0.3])
+        expected = np.array(
+            [0.2, 0.4, 0.5, 0.5, 0.15599452033620265, 0.8661761457749352, 0.3]
+        )
         self.assertAlmostEqual(0, norm(expected - self.chrome.genes))
-        
+
     def testCrossover(self):
         parent0 = Chromosome(self.context, [0, 1, 2, 3, 4, 5, 6])
         parent1 = Chromosome(self.context, [7, 8, 9, 10, 11, 12, 13])
         child0, child1 = parent0.crossover(parent1)
-        
+
         # Chromosomes together should still contain all of the original genes.
         allgenes = child0.genes + child1.genes
         allgenes.sort()
         expected = list(range(14))
         self.assertEqual(expected, allgenes)
 
-        # There is only 1 in 2^32 chance that two chromosomes of length 32 will 
+        # There is only 1 in 2^32 chance that two chromosomes of length 32 will
         # remain changed after crossover. Consider that probability zero.
         child2, child3 = self.zeros.crossover(self.ones)
         self.assertNotEqual(child2.genes, [0] * 32)
 
-        expected = [0, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 0]
+        expected = [
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            1,
+            1,
+            1,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            1,
+            1,
+            0,
+        ]
         self.assertEqual(expected, child2.genes)
-        expected = [1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 0, 1]
+        expected = [
+            1,
+            1,
+            1,
+            0,
+            1,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1,
+            1,
+            0,
+            1,
+            0,
+            0,
+            1,
+            1,
+            1,
+            0,
+            0,
+            1,
+        ]
         self.assertEqual(expected, child3.genes)
 
     def testSoftmax(self):
@@ -83,19 +150,19 @@ class TestChromosome(unittest.TestCase):
         self.assertAlmostEqual(0, norm(expected - actual))
 
     def testChromosomeSelect(self):
-        objects = list('abc')
-        expected = ['b', 'c']
+        objects = list("abc")
+        expected = ["b", "c"]
         actual = self.chrome.select(objects)
         self.assertEqual(expected, actual)
-        
-        expected = ['c', 'b']
+
+        expected = ["c", "b"]
         actual = self.chrome.select(objects)
         self.assertEqual(expected, actual)
-        
-        expected = ['a', 'a']
+
+        expected = ["a", "a"]
         actual = self.chrome.select(objects)
         self.assertEqual(expected, actual)
-        
-        expected = ['a', 'c']
+
+        expected = ["a", "c"]
         actual = self.chrome.select(objects)
         self.assertEqual(expected, actual)

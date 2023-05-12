@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.neighbors import KNeighborsRegressor
 
+
 class MetaModel(object):
     x = None
     y = None
@@ -17,4 +18,3 @@ class MetaModel(object):
 
     def predict(self, x):
         return self.m.predict(x)
-        

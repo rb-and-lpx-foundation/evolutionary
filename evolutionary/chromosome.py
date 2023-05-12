@@ -1,9 +1,11 @@
 import numpy as np
 
+
 def softmax(logits):
     distribution = np.exp(logits)
     distribution /= np.sum(distribution)
     return distribution
+
 
 class Chromosome(object):
     def __init__(self, context, genes=None, numberOfGenes=None):
@@ -26,7 +28,7 @@ class Chromosome(object):
 
     def mutationRate(self):
         return self.genes[0]
-        
+
     def mutate(self):
         rate = self.mutationRate()
         for i in range(len(self.genes)):
@@ -45,6 +47,6 @@ class Chromosome(object):
     def select(self, objects):
         selections = []
         for i in range(1, len(self), len(objects)):
-            p = softmax(self.genes[i:i + len(objects)])
+            p = softmax(self.genes[i : i + len(objects)])
             selections.append(self.r.choice(objects, p=p))
         return selections

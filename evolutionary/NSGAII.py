@@ -3,14 +3,19 @@
 
 import sys
 
+
 def domination_count_and_set(population, element):
     # gives the domination count and dominating set of the element of the population
-    
+
     domination_count = 0
-    dominated_set = [] 
+    dominated_set = []
     for chromosome in population:
-        dominated_sum = 0 # will equal number of objectives if chromosome is dominated by element
-        dominating_sum = 0 # will equal number of objectives if element is dominated by chromosome
+        dominated_sum = (
+            0  # will equal number of objectives if chromosome is dominated by element
+        )
+        dominating_sum = (
+            0  # will equal number of objectives if element is dominated by chromosome
+        )
         for i in range(len(population[element])):
             if population[element][i] < population[chromosome][i]:
                 dominated_sum += 1
@@ -19,12 +24,21 @@ def domination_count_and_set(population, element):
                 dominating_sum += 1
             else:
                 dominating_sum += 1
-        if dominated_sum == len(population[element]) and population[element] != population[chromosome]:
+        if (
+            dominated_sum == len(population[element])
+            and population[element] != population[chromosome]
+        ):
             dominated_set.append(chromosome)
-        if dominating_sum == len(population[element]) and population[element] != population[chromosome]:
+        if (
+            dominating_sum == len(population[element])
+            and population[element] != population[chromosome]
+        ):
             domination_count += 1
     return [domination_count, dominated_set]
-# what should we do if two chromosomes have the exact same objectives? here neither dominates the other    
+
+
+# what should we do if two chromosomes have the exact same objectives? here neither dominates the other
+
 
 def fast_nondominated_sort(population):
     # gives the list of the domination fronts, in order, and a dictionary with the ranks of the chromosomes
@@ -49,10 +63,11 @@ def fast_nondominated_sort(population):
                     domination_fronts[i + 1].append(chrom)
                     rank_list[chrom] = i + 2
         i += 1
-    return [rank_list, domination_fronts[:len(domination_fronts) - 1]]
-    
+    return [rank_list, domination_fronts[: len(domination_fronts) - 1]]
+
+
 def crowding_distance(population):
-# gives a dictionary in which the value of each chromosome is its crowding distance
+    # gives a dictionary in which the value of each chromosome is its crowding distance
 
     l = len(population)
     num_objectives = len(list(population.values())[0])
@@ -60,18 +75,28 @@ def crowding_distance(population):
     for chromosome in population:
         crowding_distances[chromosome] = 0
     for i in range(num_objectives):
-        ordered_by_objective = sorted(population, key = lambda x:population[x][i])
-        if population[ordered_by_objective[0]] == population[ordered_by_objective[l-1]]:
+        ordered_by_objective = sorted(population, key=lambda x: population[x][i])
+        if (
+            population[ordered_by_objective[0]]
+            == population[ordered_by_objective[l - 1]]
+        ):
             for j in range(1, l - 1):
                 crowding_distances[ordered_by_objective[j]] -= 1
         else:
-            crowding_distances[ordered_by_objective[0]] -= float("inf") 
+            crowding_distances[ordered_by_objective[0]] -= float("inf")
             crowding_distances[ordered_by_objective[l - 1]] -= float("inf")
             for j in range(1, l - 1):
-                crowding_distance = (float(population[ordered_by_objective[j + 1]][i]) - float(population[ordered_by_objective[j - 1]][i]))/(float(population[ordered_by_objective[l-1]][i]) - float(population[ordered_by_objective[0]][i]))
+                crowding_distance = (
+                    float(population[ordered_by_objective[j + 1]][i])
+                    - float(population[ordered_by_objective[j - 1]][i])
+                ) / (
+                    float(population[ordered_by_objective[l - 1]][i])
+                    - float(population[ordered_by_objective[0]][i])
+                )
                 crowding_distances[ordered_by_objective[j]] -= crowding_distance
     return crowding_distances
-    
+
+
 def log_stdout(generation, population, objectives, fronts):
     print("Generation %d" % generation)
     for p in population:
@@ -80,46 +105,54 @@ def log_stdout(generation, population, objectives, fronts):
     print(fronts)
     sys.stdout.flush()
 
+
 class log_file(object):
     def __init__(self, filename):
         self.filename = filename
-        f = open(self.filename, 'w')
+        f = open(self.filename, "w")
         f.close()
-    
+
     def log(self, generation, population, objectives, fronts):
         log_stdout(generation, population, objectives, fronts)
-        f = open(self.filename, 'a')
+        f = open(self.filename, "a")
         f.write("Generation %d\n" % generation)
         for p in population.values():
             f.write(p.genes.__str__())
             f.write("\n")
         f.close()
 
+
 def log_discard(generation, population, objectives, fronts):
     pass
+
 
 class NSGAII(object):
     def __init__(self, context, initial_population):
         self.context = context
+
         def poppair(i):
             key = i, 0
             return key, initial_population[i]
 
         self.population = dict([poppair(i) for i in range(len(initial_population))])
-        
+
     def get_objectives(self, population):
         objectives = {}
         for chromosome in population:
-            objectives[chromosome] = population[chromosome].getObjectives()   
-        return objectives 
+            objectives[chromosome] = population[chromosome].getObjectives()
+        return objectives
 
     def new_population(self, parents, parents_objectives, children):
         # combines the two new populations and then selects the best chromosome with respect to the crowded comparison order
-        
+
         children_objectives = self.get_objectives(children)
 
-        combined_population_hyperparameters = dict(list(parents.items()) + list(children.items()))
-        combined_population_objectives = dict(list(parents_objectives.items()) + list(children_objectives.items()))
+        combined_population_hyperparameters = dict(
+            list(parents.items()) + list(children.items())
+        )
+        combined_population_objectives = dict(
+            list(parents_objectives.items()) + list(children_objectives.items())
+        )
         fns = fast_nondominated_sort(combined_population_objectives)
         fronts = fns[1]
 
@@ -130,17 +163,29 @@ class NSGAII(object):
         while spaces_remaining > 0:
             if spaces_remaining >= len(fronts[front]):
                 for chromosome in fronts[front]:
-                    new_pop_objectives[chromosome] = combined_population_objectives[chromosome]
-                    new_pop_hyperparameters[chromosome] = combined_population_hyperparameters[chromosome]
+                    new_pop_objectives[chromosome] = combined_population_objectives[
+                        chromosome
+                    ]
+                    new_pop_hyperparameters[
+                        chromosome
+                    ] = combined_population_hyperparameters[chromosome]
                     spaces_remaining -= 1
                 front += 1
             else:
                 crowding_distances = crowding_distance(combined_population_objectives)
-                front_with_crowding = dict((key, crowding_distances[key]) for key in fronts[front])
-                sorted_by_crowding = sorted(front_with_crowding, key = lambda x:front_with_crowding[x])
+                front_with_crowding = dict(
+                    (key, crowding_distances[key]) for key in fronts[front]
+                )
+                sorted_by_crowding = sorted(
+                    front_with_crowding, key=lambda x: front_with_crowding[x]
+                )
                 for i in range(spaces_remaining):
-                    new_pop_objectives[sorted_by_crowding[i]] = combined_population_objectives[sorted_by_crowding[i]]
-                    new_pop_hyperparameters[sorted_by_crowding[i]] = combined_population_hyperparameters[sorted_by_crowding[i]]
+                    new_pop_objectives[
+                        sorted_by_crowding[i]
+                    ] = combined_population_objectives[sorted_by_crowding[i]]
+                    new_pop_hyperparameters[
+                        sorted_by_crowding[i]
+                    ] = combined_population_hyperparameters[sorted_by_crowding[i]]
                 spaces_remaining = 0
         return new_pop_hyperparameters, new_pop_objectives, fronts
 
@@ -164,8 +209,12 @@ class NSGAII(object):
 
     def evolve(self, num_generations=100, log_out=log_discard):
         objectives = self.get_objectives(self.population)
-        for generation in range(num_generations): 
-            self.population, objectives, self.fronts = self.new_population(self.population, objectives, self.make_children(self.population, generation))
+        for generation in range(num_generations):
+            self.population, objectives, self.fronts = self.new_population(
+                self.population,
+                objectives,
+                self.make_children(self.population, generation),
+            )
             log_out(generation, self.population, objectives, self.fronts)
-                
+
         return self.population.values()
