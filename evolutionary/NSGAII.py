@@ -166,9 +166,9 @@ class NSGAII(object):
                     new_pop_objectives[chromosome] = combined_population_objectives[
                         chromosome
                     ]
-                    new_pop_hyperparameters[chromosome] = (
-                        combined_population_hyperparameters[chromosome]
-                    )
+                    new_pop_hyperparameters[
+                        chromosome
+                    ] = combined_population_hyperparameters[chromosome]
                     spaces_remaining -= 1
                 front += 1
             else:
@@ -180,12 +180,12 @@ class NSGAII(object):
                     front_with_crowding, key=lambda x: front_with_crowding[x]
                 )
                 for i in range(spaces_remaining):
-                    new_pop_objectives[sorted_by_crowding[i]] = (
-                        combined_population_objectives[sorted_by_crowding[i]]
-                    )
-                    new_pop_hyperparameters[sorted_by_crowding[i]] = (
-                        combined_population_hyperparameters[sorted_by_crowding[i]]
-                    )
+                    new_pop_objectives[
+                        sorted_by_crowding[i]
+                    ] = combined_population_objectives[sorted_by_crowding[i]]
+                    new_pop_hyperparameters[
+                        sorted_by_crowding[i]
+                    ] = combined_population_hyperparameters[sorted_by_crowding[i]]
                 spaces_remaining = 0
         return new_pop_hyperparameters, new_pop_objectives, fronts
 
