@@ -35,7 +35,8 @@ def test_copy(chrome):
     assert copy.genes[0] == 0
     assert chrome.genes[0] != 0
 
-    # on the other hand, the original and the copy should be using the same random number generator
+    # on the other hand, the original and the copy should be using the same
+    # random number generator
     r = np.random.RandomState(42)
     first5 = list(r.randint(10, size=5))
     next5 = list(r.randint(10, size=5))

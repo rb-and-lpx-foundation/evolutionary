@@ -37,11 +37,13 @@ def domination_count_and_set(population, element):
     return [domination_count, dominated_set]
 
 
-# what should we do if two chromosomes have the exact same objectives? here neither dominates the other
+# what should we do if two chromosomes have the exact same objectives?
+# here neither dominates the other
 
 
 def fast_nondominated_sort(population):
-    # gives the list of the domination fronts, in order, and a dictionary with the ranks of the chromosomes
+    # gives the list of the domination fronts, in order,
+    # and a dictionary with the ranks of the chromosomes
 
     domination_dict = {}
     for chromosome in population:
@@ -69,7 +71,7 @@ def fast_nondominated_sort(population):
 def crowding_distance(population):
     # gives a dictionary in which the value of each chromosome is its crowding distance
 
-    l = len(population)
+    size = len(population)
     num_objectives = len(list(population.values())[0])
     crowding_distances = {}
     for chromosome in population:
@@ -78,19 +80,19 @@ def crowding_distance(population):
         ordered_by_objective = sorted(population, key=lambda x: population[x][i])
         if (
             population[ordered_by_objective[0]]
-            == population[ordered_by_objective[l - 1]]
+            == population[ordered_by_objective[size - 1]]
         ):
-            for j in range(1, l - 1):
+            for j in range(1, size - 1):
                 crowding_distances[ordered_by_objective[j]] -= 1
         else:
             crowding_distances[ordered_by_objective[0]] -= float("inf")
-            crowding_distances[ordered_by_objective[l - 1]] -= float("inf")
-            for j in range(1, l - 1):
+            crowding_distances[ordered_by_objective[size - 1]] -= float("inf")
+            for j in range(1, size - 1):
                 crowding_distance = (
                     float(population[ordered_by_objective[j + 1]][i])
                     - float(population[ordered_by_objective[j - 1]][i])
                 ) / (
-                    float(population[ordered_by_objective[l - 1]][i])
+                    float(population[ordered_by_objective[size - 1]][i])
                     - float(population[ordered_by_objective[0]][i])
                 )
                 crowding_distances[ordered_by_objective[j]] -= crowding_distance
@@ -143,7 +145,8 @@ class NSGAII(object):
         return objectives
 
     def new_population(self, parents, parents_objectives, children):
-        # combines the two new populations and then selects the best chromosome with respect to the crowded comparison order
+        # combines the two new populations and then selects the best chromosome
+        # with respect to the crowded comparison order
 
         children_objectives = self.get_objectives(children)
 
@@ -166,9 +169,9 @@ class NSGAII(object):
                     new_pop_objectives[chromosome] = combined_population_objectives[
                         chromosome
                     ]
-                    new_pop_hyperparameters[
-                        chromosome
-                    ] = combined_population_hyperparameters[chromosome]
+                    new_pop_hyperparameters[chromosome] = (
+                        combined_population_hyperparameters[chromosome]
+                    )
                     spaces_remaining -= 1
                 front += 1
             else:
@@ -180,12 +183,12 @@ class NSGAII(object):
                     front_with_crowding, key=lambda x: front_with_crowding[x]
                 )
                 for i in range(spaces_remaining):
-                    new_pop_objectives[
-                        sorted_by_crowding[i]
-                    ] = combined_population_objectives[sorted_by_crowding[i]]
-                    new_pop_hyperparameters[
-                        sorted_by_crowding[i]
-                    ] = combined_population_hyperparameters[sorted_by_crowding[i]]
+                    new_pop_objectives[sorted_by_crowding[i]] = (
+                        combined_population_objectives[sorted_by_crowding[i]]
+                    )
+                    new_pop_hyperparameters[sorted_by_crowding[i]] = (
+                        combined_population_hyperparameters[sorted_by_crowding[i]]
+                    )
                 spaces_remaining = 0
         return new_pop_hyperparameters, new_pop_objectives, fronts
 
